@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pagador
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+pix:
+  # Em produção, QR de site "-h" (homologação) é recusado (regra R07).
+  ambiente-producao: true
+  # Rodando pelo IDE: simuladores em localhost:8081. No docker compose, as variáveis abaixo são trocadas.
+  dict-url: http://localhost:8081
+  bcb-url: http://localhost:8081
+  spi-url: http://localhost:8081
+  simulacao:
+    # Porta dos "sites" dos PSPs recebedores. No docker é 80; pelo IDE, 8081 (+ /etc/hosts, ver README).
+    porta-recebedor: 8081
+  spi:
+    timeout-segundos: 5
+    max-consultas: 3
+  agendamento:
+    max-tentativas: 2
+    horario-limite-retentativa: "21:00"
+
+aws:
+  endpoint: http://localhost:4566
+  region: sa-east-1
+  tabela-pagamentos: pix-pagamentos
+  bucket-nao-repudio: pix-nao-repudio
+  fila-envio: spi-pacs008
+  fila-retorno: spi-pacs002
+
+logging:
+  level:
+    software.amazon.awssdk: warn

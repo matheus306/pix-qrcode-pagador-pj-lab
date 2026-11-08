@@ -1,0 +1,13 @@
+server:
+  # No docker compose a porta é 80 (os "sites" dos recebedores não têm porta na URL do QR).
+  port: 8081
+
+aws:
+  endpoint: http://localhost:4566
+  region: sa-east-1
+  fila-envio: spi-pacs008
+  fila-retorno: spi-pacs002
+
+logging:
+  level:
+    software.amazon.awssdk: warn

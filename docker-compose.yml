@@ -1,0 +1,63 @@
+# Laboratório do pagador PJ de Pix por QR Code.
+#   docker compose up --build        -> sobe tudo
+#   docker compose up localstack simuladores   -> sobe só a infra (rode o pagador pelo IDE)
+services:
+
+  localstack:
+    # Imagem gratuita (Community) com versão fixa. Só usamos SQS, DynamoDB e S3.
+    image: localstack/localstack:3.8.1
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: sqs,dynamodb,s3
+      AWS_DEFAULT_REGION: sa-east-1
+    volumes:
+      - ./localstack/init/ready.d:/etc/localstack/init/ready.d
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s localhost:4566/_localstack/init/ready | grep -q '\"completed\": true'"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  simuladores:
+    build:
+      context: .
+      dockerfile: simuladores/Dockerfile
+    ports:
+      - "8081:80"
+    environment:
+      SERVER_PORT: "80"
+      AWS_ENDPOINT: http://localstack:4566
+    depends_on:
+      localstack:
+        condition: service_healthy
+    networks:
+      default:
+        # Os "sites" dos PSPs recebedores: o mesmo container responde por todos esses nomes.
+        aliases:
+          - pix.recebedor-a.local
+          - qrcode-h.recebedor-a.local
+          - pix.recebedor-revogado.local
+          - pix.nao-cadastrado.local
+          - pix.tls-antigo.local
+          - pix.wildcard.local
+          - pix.sem-ev.local
+
+  pagador:
+    build:
+      context: .
+      dockerfile: pagador/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      PIX_DICT_URL: http://simuladores
+      PIX_BCB_URL: http://simuladores
+      PIX_SPI_URL: http://simuladores
+      PIX_SIMULACAO_PORTA_RECEBEDOR: "80"
+      AWS_ENDPOINT: http://localstack:4566
+      TZ: America/Sao_Paulo
+    depends_on:
+      localstack:
+        condition: service_healthy
+      simuladores:
+        condition: service_started

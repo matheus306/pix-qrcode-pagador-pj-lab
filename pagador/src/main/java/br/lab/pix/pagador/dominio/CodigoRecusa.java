@@ -1,0 +1,24 @@
+package br.lab.pix.pagador.dominio;
+
+/** Motivos pelos quais o pagador interrompe o fluxo antes de enviar o Pix. */
+public enum CodigoRecusa {
+    QR_INVALIDO,
+    QR_HOMOLOGACAO,
+    CERTIFICADO_INVALIDO,
+    ASSINATURA_INVALIDA,
+    PAYLOAD_INDISPONIVEL,
+    COBRANCA_NAO_PAGAVEL,
+    QR_EXPIRADO,
+    QR_VENCIDO,
+    VALOR_INVALIDO,
+    CAMPO_NAO_PERMITIDO,
+    CHAVE_INEXISTENTE,
+    FRAUDE,
+    DICT_INDISPONIVEL,
+    SALDO_INSUFICIENTE,
+    LIMITE_PIX_AGENDADO,
+    AGENDAMENTO_NAO_PERMITIDO,
+    CANCELAMENTO_FORA_DO_PRAZO,
+    ESTADO_INVALIDO,
+    NAO_SUPORTADO
+}
